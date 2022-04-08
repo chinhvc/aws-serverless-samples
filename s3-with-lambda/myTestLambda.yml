@@ -24,6 +24,7 @@ Resources:
                   Action:
                   - logs:*
                   Resource: arn:aws:logs:*:*:*
+            RoleName: TestRoleExecuteLambda
 
     LambdaFunResource:
         Type: AWS::Lambda::Function
