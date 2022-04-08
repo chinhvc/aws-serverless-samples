@@ -1,21 +1,47 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'A template is for creating lambda '
+Description: 'A template is for creating role and lambda'
 Resources:
+    TestRoleExecuteLambda:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                - Effect: Allow
+                  Principal:
+                    Service:
+                    - lambda.amazonaws.com
+                  Action:
+                  - sts:AssumeRole
+            Path: "/"
+            Policies:
+            - PolicyName: root
+              PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                - Effect: Allow
+                  Action:
+                  - logs:*
+                  Resource: arn:aws:logs:*:*:*
+
     LambdaFunResource:
         Type: AWS::Lambda::Function
         Properties:
-        FunctionName: ChinhVCcfn
-        Code:
-            ZipFile:
-            Fn::Join:
-            - "\n"
-            - - 'def lambda_handler(event, context):'
-              - "    print('THIS IS LAMBDA CREATED FROM CloudFormation')"
-              - "    return 'success'"
-        Description: Used to run job
-        Handler: index.lambda_handler
-        Role: arn:aws:iam::223320623045:role/chinhvc1RoleExecuteLambda
-        Runtime: python3.6
-        Timeout: 120
-    
+          FunctionName: Testcfn
+          Code:
+              ZipFile:
+                Fn::Join:
+                - "\n"
+                - - 'def lambda_handler(event, context):'
+                  - "    print('THIS IS LAMBDA CREATED FROM CloudFormation')"
+                  - "    return 'success'"
+          Description: Used to run job
+          Handler: index.lambda_handler
+          Role: !GetAtt 'TestRoleExecuteLambda.Arn'
+          Runtime: python3.6
+          Timeout: 120
+          TracingConfig:
+            Mode: Active
+        DependsOn:
+        - TestRoleExecuteLambda
